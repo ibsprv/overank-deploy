@@ -1,0 +1,30 @@
+version: "3.3"
+services:
+  overank-db:
+    container_name: overank-db
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - overank-net
+    volumes:
+      - db-data:/data/db
+
+  mongo-seed:
+    container_name: overank-seed-mongo
+    image: mongo:latest
+    entrypoint: "mongoimport -v --uri mongodb://overank-db/overank --collection test --drop --type json --file /import/test.json --jsonArray"
+    restart: "no"
+    networks:
+      - overank-net
+    volumes:
+      - ../seed:/import
+    depends_on:
+      - overank-db
+
+networks:
+  overank-net:
+    driver: bridge
+
+volumes:
+  db-data:
